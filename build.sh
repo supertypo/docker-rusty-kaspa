@@ -57,29 +57,26 @@ plain_build() {
 }
 
 multi_arch_build() {
-  for arch in $ARCHES; do
-    echo
-    echo "===================================================="
-    echo " Running $arch build for $1"
-    echo "===================================================="
-    dockerRepo="${DOCKER_REPO_PREFIX}-$1"
-    dockerRepoArgs="--load"
-    if [ "$PUSH" = "push" ]; then
-      dockerRepoArgs="--push"
-      if [ "$REPO_URL" = "$REPO_URL_MAIN" ]; then
-        dockerRepoArgs="$dockerRepoArgs --tag $dockerRepo:latest"
-      fi
+  echo
+  echo "===================================================="
+  echo " Running build for $1"
+  echo "===================================================="
+  dockerRepo="${DOCKER_REPO_PREFIX}-$1"
+  if [ "$PUSH" = "push" ]; then
+    dockerRepoArgs="--push"
+    if [ "$REPO_URL" = "$REPO_URL_MAIN" ]; then
+      dockerRepoArgs="$dockerRepoArgs --tag $dockerRepo:latest"
     fi
-    $docker buildx build --pull --platform $arch $dockerRepoArgs \
-      --build-arg REPO_URL=$REPO_URL \
-      --build-arg REPO_DIR="$REPO_DIR" \
-      --build-arg RUSTY_VERSION="$tag" \
-      --target $1 \
-      --tag $dockerRepo:$tag "$BUILD_DIR"    
-    echo "===================================================="
-    echo " Completed $arch build for $1"
-    echo "===================================================="
-  done
+  fi
+  $docker buildx build --pull --platform=$(echo $ARCHES | sed 's/ /,/g') $dockerRepoArgs \
+    --build-arg REPO_URL=$REPO_URL \
+    --build-arg REPO_DIR="$REPO_DIR" \
+    --build-arg RUSTY_VERSION="$tag" \
+    --target $1 \
+    --tag $dockerRepo:$tag "$BUILD_DIR"    
+  echo "===================================================="
+  echo " Completed build for $1"
+  echo "===================================================="
 }
 
 echo

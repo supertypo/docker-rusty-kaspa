@@ -41,8 +41,10 @@ RUN apk --no-cache add \
   libstdc++ \
   dumb-init
 
-RUN addgroup -S -g $RUSTY_UID rusty \
-  && adduser -h /app/data -S -D -g '' -G rusty -u $RUSTY_UID rusty
+
+RUN mkdir -p /app/data/ && \
+  addgroup -S -g $RUSTY_UID rusty && \
+  adduser -h /app/data -S -D -g '' -G rusty -u $RUSTY_UID rusty
 
 USER rusty
 

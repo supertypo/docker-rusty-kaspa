@@ -1,3 +1,6 @@
+##
+# builder image
+##
 FROM rust:1.68-alpine3.17 AS builder
 
 ARG REPO_DIR
@@ -8,8 +11,7 @@ RUN apk --no-cache add \
   g++ \
   clang15-dev \
   linux-headers \
-  wasm-pack \
-  git
+  wasm-pack
 
 RUN rustup component add rustfmt
 
@@ -21,7 +23,9 @@ ENV RUSTFLAGS="-C target-feature=-crt-static"
 
 RUN cargo build --workspace --release
 
-
+##
+# base runtime image
+##
 FROM alpine AS rusty
 
 ARG REPO_URL
@@ -38,20 +42,27 @@ RUN apk --no-cache add \
   dumb-init
 
 RUN addgroup -S -g $RUSTY_UID rusty \
-  && adduser -h /app -S -D -g '' -G rusty -u $RUSTY_UID rusty
+  && adduser -h /app/data -S -D -g '' -G rusty -u $RUSTY_UID rusty
 
 USER rusty
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
-
+##
+# kaspad image
+##
 FROM rusty AS kaspad
+
+EXPOSE 16111 16110 17110 18110
+VOLUME /app/data
 
 COPY --from=builder /rusty-kaspa/target/release/kaspad /app
 
 CMD kaspad --help
 
-
+##
+# kaspa-wrpc-proxy image
+##
 FROM rusty AS kaspa-wrpc-proxy
 
 COPY --from=builder /rusty-kaspa/target/release/kaspa-wrpc-proxy /app

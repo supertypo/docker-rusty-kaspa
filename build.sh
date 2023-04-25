@@ -4,7 +4,7 @@
 
 REPO_URL_MAIN="https://github.com/kaspanet/rusty-kaspa"
 DOCKER_REPO_PREFIX="supertypo/rusty"
-ARTIFACTS="kaspad kaspa-wrpc-proxy"
+ARTIFACTS="builder kaspad kaspa-wrpc-proxy"
 ARCHES="linux/amd64 linux/arm64"
 
 BUILD_DIR="$(dirname $0)"
@@ -25,7 +25,7 @@ echo "===================================================="
 echo " Pulling $REPO_URL"
 echo "===================================================="
 (cd "$REPO_DIR" && git pull)
-if if [ -n "$TAG" ]; then
+if [ -n "$TAG" ]; then
   (cd "$REPO_DIR" && git checkout $TAG)
 fi
 tag=$(cd "$REPO_DIR" && git log -n1 --format="%cs.%h")

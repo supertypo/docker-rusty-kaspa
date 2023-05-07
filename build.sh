@@ -4,7 +4,7 @@
 
 REPO_URL_MAIN="https://github.com/kaspanet/rusty-kaspa"
 DOCKER_REPO_PREFIX="supertypo/rusty"
-ARTIFACTS="builder kaspad kaspa-wrpc-proxy"
+ARTIFACTS="kaspad kaspa-wrpc-proxy kaspa-wallet-cli-native simpa rothschild"
 ARCHES="linux/amd64 linux/arm64"
 
 BUILD_DIR="$(dirname $0)"
@@ -100,23 +100,29 @@ multi_arch_build() {
     --build-arg REPO_DIR="$REPO_DIR" \
     --build-arg RUSTY_VERSION="$tag" \
     --target $1 \
-    --tag $dockerRepo:$tag "$BUILD_DIR"    
+    --tag $dockerRepo:$tag "$BUILD_DIR"
   echo "===================================================="
   echo " Completed build for $1"
   echo "===================================================="
 }
 
-echo
-echo "===================================================="
-echo " Setup multi arch build ($ARCHES)"
-echo "===================================================="
-if $docker buildx create --name=mybuilder --append --node=mybuilder0 --platform=$(echo $ARCHES | sed 's/ /,/g') --bootstrap --use 1>/dev/null 2>&1; then
-  echo "SUCCESS - doing multi arch build"
-  for artifact in $ARTIFACTS; do
-    multi_arch_build $artifact
-  done
+if [ "$PUSH" = "push" ]; then
+  echo
+  echo "===================================================="
+  echo " Setup multi arch build ($ARCHES)"
+  echo "===================================================="
+  if $docker buildx create --name=mybuilder --append --node=mybuilder0 --platform=$(echo $ARCHES | sed 's/ /,/g') --bootstrap --use 1>/dev/null 2>&1; then
+    echo "SUCCESS - doing multi arch build"
+    for artifact in $ARTIFACTS; do
+      multi_arch_build $artifact
+    done
+  else
+    echo "FAILED - building on current arch"
+    for artifact in $ARTIFACTS; do
+      plain_build $artifact
+    done
+  fi
 else
-  echo "FAILED - building on current arch"
   for artifact in $ARTIFACTS; do
     plain_build $artifact
   done

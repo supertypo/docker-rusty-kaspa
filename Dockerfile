@@ -71,3 +71,30 @@ COPY --from=builder /rusty-kaspa/target/release/kaspa-wrpc-proxy /app
 
 CMD kaspa-wrpc-proxy --help
 
+##
+# kaspa-wallet-cli-native image
+##
+FROM rusty AS kaspa-wallet-cli-native
+
+COPY --from=builder /rusty-kaspa/target/release/kaspa-wallet-cli-native /app
+
+CMD kaspa-wallet-cli-native --help
+
+##
+# simpa image
+##
+FROM rusty AS simpa
+
+COPY --from=builder /rusty-kaspa/target/release/simpa /app
+
+CMD simpa --help
+
+##
+# rothschild image
+##
+FROM rusty AS rothschild
+
+COPY --from=builder /rusty-kaspa/target/release/rothschild /app
+
+CMD rothschild --help
+

@@ -60,7 +60,7 @@ VOLUME /app/data
 
 COPY --from=builder /rusty-kaspa/target/release/kaspad /app
 
-CMD kaspad --utxoindex
+CMD kaspad --nologfiles --utxoindex
 
 ##
 # kaspa-wrpc-proxy image

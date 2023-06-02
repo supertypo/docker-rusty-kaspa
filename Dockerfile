@@ -19,7 +19,8 @@ COPY "$REPO_DIR" /rusty-kaspa
 
 WORKDIR /rusty-kaspa
 
-ENV RUSTFLAGS="-C target-feature=-crt-static"
+ENV RUSTFLAGS="-C target-feature=-crt-static" \
+  CARGO_REGISTRIES_CRATES_IO_PROTOCOL="sparse"
 
 RUN cargo build --workspace --release
 

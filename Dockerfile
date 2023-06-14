@@ -1,7 +1,7 @@
 ##
 # builder image
 ##
-FROM rust:1.68-alpine3.17 AS builder
+FROM rust:1-alpine AS builder
 
 ARG REPO_DIR
 

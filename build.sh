@@ -88,10 +88,11 @@ multi_arch_build() {
     dockerRepoArgs="$dockerRepoArgs --tag $dockerRepo:$VERSION"
   fi
   if [ "$REPO_URL" = "$REPO_URL_MAIN" ]; then
-    dockerRepoArgs="$dockerRepoArgs --tag $dockerRepo:nightly"
     if [ -n "$VERSION" ]; then
       dockerRepoArgs="$dockerRepoArgs --tag $dockerRepo:latest"
-    fi 
+    else
+      dockerRepoArgs="$dockerRepoArgs --tag $dockerRepo:nightly"
+    fi
   fi
   $docker buildx build --pull --platform=$(echo $ARCHES | sed 's/ /,/g') $dockerRepoArgs \
     --build-arg REPO_URL=$REPO_URL \

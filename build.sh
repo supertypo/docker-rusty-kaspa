@@ -10,7 +10,7 @@ ARCHES="linux/amd64 linux/arm64"
 BUILD_DIR="$(dirname $0)"
 PUSH=$1
 VERSION=$2
-TAG=$3
+TAG=${3:-master}
 REPO_URL=${4:-$REPO_URL_MAIN}
 REPO_DIR="$BUILD_DIR/work/$(echo $REPO_URL | sed -E 's/[^a-zA-Z0-9]+/_/g')"
 
@@ -24,10 +24,8 @@ fi
 echo "===================================================="
 echo " Pulling $REPO_URL"
 echo "===================================================="
-(cd "$REPO_DIR" && git pull)
-if [ -n "$TAG" ]; then
-  (cd "$REPO_DIR" && git checkout $TAG)
-fi
+(cd "$REPO_DIR" && git fetch && git checkout $TAG && (git pull 2>/dev/null | true))
+
 tag=$(cd "$REPO_DIR" && git log -n1 --format="%cs.%h")
 
 docker=docker

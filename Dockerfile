@@ -11,7 +11,8 @@ RUN apk --no-cache add \
   g++ \
   clang15-dev \
   linux-headers \
-  wasm-pack
+  wasm-pack \
+  openssl-dev
 
 RUN rustup component add rustfmt
 
@@ -40,8 +41,8 @@ ENV REPO_URL="$REPO_URL" \
 RUN apk --no-cache add \
   libgcc \
   libstdc++ \
+  bind-tools \
   dumb-init
-
 
 RUN mkdir -p /app/data/ && \
   addgroup -S -g $RUSTY_UID rusty && \
@@ -49,7 +50,9 @@ RUN mkdir -p /app/data/ && \
 
 USER rusty
 
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+COPY ./entrypoint.sh /app/
+
+ENTRYPOINT ["/app/entrypoint.sh"]
 
 ##
 # kaspad image
@@ -61,7 +64,7 @@ VOLUME /app/data
 
 COPY --from=builder /rusty-kaspa/target/release/kaspad /app
 
-CMD kaspad --nologfiles --utxoindex
+CMD kaspad --externalip=$EXTERNAL_IP --nologfiles --utxoindex
 
 ##
 # kaspa-wrpc-proxy image

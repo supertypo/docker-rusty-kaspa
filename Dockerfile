@@ -52,7 +52,7 @@ USER rusty
 
 COPY ./entrypoint.sh /app/
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["dumb-init", "--"]
 
 ##
 # kaspad image
@@ -62,9 +62,11 @@ FROM rusty AS kaspad
 EXPOSE 16111 16110 17110 18110
 VOLUME /app/data
 
+ENTRYPOINT ["entrypoint.sh"]
+
 COPY --from=builder /rusty-kaspa/target/release/kaspad /app
 
-CMD kaspad --nologfiles --utxoindex
+CMD ["kaspad", "--nologfiles", "--utxoindex"]
 
 ##
 # kaspa-wrpc-proxy image
@@ -73,7 +75,7 @@ FROM rusty AS kaspa-wrpc-proxy
 
 COPY --from=builder /rusty-kaspa/target/release/kaspa-wrpc-proxy /app
 
-CMD kaspa-wrpc-proxy --help
+CMD ["kaspa-wrpc-proxy", "--help"]
 
 ##
 # kaspa-wallet-cli-native image
@@ -82,7 +84,7 @@ FROM rusty AS kaspa-wallet-cli-native
 
 COPY --from=builder /rusty-kaspa/target/release/kaspa-wallet-cli-native /app
 
-CMD kaspa-wallet-cli-native --help
+CMD ["kaspa-wallet-cli-native", "--help"]
 
 ##
 # simpa image
@@ -91,7 +93,7 @@ FROM rusty AS simpa
 
 COPY --from=builder /rusty-kaspa/target/release/simpa /app
 
-CMD simpa --help
+CMD ["simpa", "--help"]
 
 ##
 # rothschild image
@@ -100,5 +102,5 @@ FROM rusty AS rothschild
 
 COPY --from=builder /rusty-kaspa/target/release/rothschild /app
 
-CMD rothschild --help
+CMD ["rothschild", "--help"]
 

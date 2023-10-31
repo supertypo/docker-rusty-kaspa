@@ -5,7 +5,7 @@ IPV6=$(dig -4 TXT +short +nocomments +timeout=2 +tries=3 o-o.myaddr.l.google.com
 
 if [ "${IPV4}x" != "x" ]; then
   export EXTERNAL_IP=$IPV4
-elif [ "${IPV4}x" != "x" ]; then
+elif [ "${IPV6}x" != "x" ]; then
   export EXTERNAL_IP=$IPV6
 fi
 
@@ -14,7 +14,7 @@ if [ -n "$EXTERNAL_IP" ]; then
     *externalip*) exec dumb-init -- "$@" ;;
     *)
       case "$@" in
-        kaspad*) exec dumb-init -- "$@" --externalip=$EXTERNAL_IP ;;
+        *kaspad*) exec dumb-init -- "$@" --externalip=$EXTERNAL_IP ;;
         *) exec dumb-init -- "$@" ;;
       esac
     ;;

@@ -57,6 +57,7 @@ ENTRYPOINT ["dumb-init", "--"]
 ##
 # kaspad image
 ##
+FROM supertypo/kaspad:latest AS golang-kaspad
 FROM rusty AS kaspad
 
 EXPOSE 16111 16110 17110 18110
@@ -64,6 +65,7 @@ VOLUME /app/data
 
 ENTRYPOINT ["entrypoint.sh"]
 
+COPY --from=golang-kaspad /app/kaspactl /app
 COPY --from=builder /rusty-kaspa/target/release/kaspad /app
 
 CMD ["kaspad", "--nologfiles", "--utxoindex"]

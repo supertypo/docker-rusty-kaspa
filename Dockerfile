@@ -42,7 +42,8 @@ RUN apk --no-cache add \
   libgcc \
   libstdc++ \
   bind-tools \
-  dumb-init
+  dumb-init \
+  grep
 
 RUN mkdir -p /app/data/ && \
   addgroup -S -g $RUSTY_UID rusty && \

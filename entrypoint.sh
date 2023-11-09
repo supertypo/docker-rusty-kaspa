@@ -17,7 +17,7 @@ else
       externalIp="${externalIp}:$(echo "$@" | grep -oP "\--listen(=| )\S+:\K\d+( |$)" | tail -1)"
     fi
     echo "Public address resolved to: $externalIp"
-    exec dumb-init -- "$@" --externalip="$externalIp"
+    exec dumb-init -- "$@" --externalip=$externalIp
   else
     echo "Public address not found"
     exec dumb-init -- "$@"

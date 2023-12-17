@@ -40,14 +40,12 @@ plain_build() {
   dockerRepo="${DOCKER_REPO_PREFIX}-$1"
 
   $docker build --pull \
-    --build-arg REPO_URL=$REPO_URL \
     --build-arg REPO_DIR="$REPO_DIR" \
+    --build-arg ARTIFACTS="$ARTIFACTS" \
+    --build-arg REPO_URL=$REPO_URL \
     --build-arg RUSTY_VERSION="$tag" \
     --target $1 \
     --tag $dockerRepo:$tag "$BUILD_DIR"
-
-  $docker tag $dockerRepo:$tag $dockerRepo:nightly
-  echo Tagged $dockerRepo:nightly
 
   if [ -n "$VERSION" ]; then
      $docker tag $dockerRepo:$tag $dockerRepo:$VERSION
@@ -56,18 +54,20 @@ plain_build() {
        $docker tag $dockerRepo:$tag $dockerRepo:latest
        echo Tagged $dockerRepo:latest
      fi
+   else
+     $docker tag $dockerRepo:$tag $dockerRepo:nightly
+     echo Tagged $dockerRepo:nightly
   fi
 
   if [ "$PUSH" = "push" ]; then
     $docker push $dockerRepo:$tag
     if [ -n "$VERSION" ]; then
-      $docker push $dockerRepo:$VERSION
-    fi
-    if [ "$REPO_URL" = "$REPO_URL_MAIN" ]; then
-      $docker push $dockerRepo:nightly
-      if [ -n "$VERSION" ]; then
-        $docker push $dockerRepo:latest
-      fi
+       $docker push $dockerRepo:$VERSION
+       if [ "$REPO_URL" = "$REPO_URL_MAIN" ]; then
+         $docker push $dockerRepo:latest
+       fi
+     else
+       $docker push $dockerRepo:nightly
     fi
   fi
   echo "===================================================="
@@ -87,17 +87,16 @@ multi_arch_build() {
   fi
   if [ -n "$VERSION" ]; then
     dockerRepoArgs="$dockerRepoArgs --tag $dockerRepo:$VERSION"
-  fi
-  if [ "$REPO_URL" = "$REPO_URL_MAIN" ]; then
-    if [ -n "$VERSION" ]; then
+    if [ "$REPO_URL" = "$REPO_URL_MAIN" ]; then
       dockerRepoArgs="$dockerRepoArgs --tag $dockerRepo:latest"
-    else
-      dockerRepoArgs="$dockerRepoArgs --tag $dockerRepo:nightly"
     fi
+  else
+    dockerRepoArgs="$dockerRepoArgs --tag $dockerRepo:nightly"
   fi
   $docker buildx build --pull --platform=$(echo $ARCHES | sed 's/ /,/g') $dockerRepoArgs \
-    --build-arg REPO_URL=$REPO_URL \
     --build-arg REPO_DIR="$REPO_DIR" \
+    --build-arg ARTIFACTS="$ARTIFACTS" \
+    --build-arg REPO_URL=$REPO_URL \
     --build-arg RUSTY_VERSION="$tag" \
     --target $1 \
     --tag $dockerRepo:$tag "$BUILD_DIR"

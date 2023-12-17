@@ -4,6 +4,7 @@
 FROM rust:1-alpine AS builder
 
 ARG REPO_DIR
+ARG ARTIFACTS
 
 RUN apk --no-cache add \
   musl-dev \
@@ -23,7 +24,9 @@ WORKDIR /rusty-kaspa
 ENV RUSTFLAGS="-C target-feature=-crt-static" \
   CARGO_REGISTRIES_CRATES_IO_PROTOCOL="sparse"
 
-RUN cargo build --workspace --release
+RUN for artifact in $ARTIFACTS; do \
+  cargo build --release --bin $artifact \
+done
 
 ##
 # base runtime image

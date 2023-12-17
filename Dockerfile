@@ -25,7 +25,7 @@ ENV RUSTFLAGS="-C target-feature=-crt-static" \
   CARGO_REGISTRIES_CRATES_IO_PROTOCOL="sparse"
 
 RUN for artifact in $ARTIFACTS; do \
-  cargo build --release --bin $artifact \
+  cargo build --release --bin $artifact; \
 done
 
 ##

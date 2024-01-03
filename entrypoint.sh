@@ -6,7 +6,7 @@ elif echo "$@" | grep -qE "\--externalip(=| )"; then
   exec dumb-init -- "$@"
 else
   externalIp4=$(dig -4 TXT +short +nocomments +timeout=2 +tries=3 o-o.myaddr.l.google.com @ns1.google.com | sed 's/;;.*//' | sed 's/"//g')
-  externalIp6=$(dig -4 TXT +short +nocomments +timeout=2 +tries=3 o-o.myaddr.l.google.com @ns1.google.com | sed 's/;;.*//' | sed 's/"//g')
+  externalIp6=$(dig -6 TXT +short +nocomments +timeout=2 +tries=3 o-o.myaddr.l.google.com @ns1.google.com | sed 's/;;.*//' | sed 's/"//g')
   if [ -n "$externalIp4" ]; then
     externalIp=$externalIp4
   elif [ -n "$externalIp6" ]; then

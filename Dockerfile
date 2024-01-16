@@ -70,7 +70,7 @@ ENTRYPOINT ["entrypoint.sh"]
 COPY --from=golang-kaspad /app/kaspactl /app
 COPY --from=builder /rusty-kaspa/target/release/kaspad /app
 
-CMD ["kaspad", "--nologfiles", "--utxoindex"]
+CMD ["kaspad", "--yes", "--nologfiles", "--disable-upnp", "--utxoindex", "--rpclisten=0.0.0.0:16110", "--rpclisten-borsh=0.0.0.0:17110", "--rpclisten-json=0.0.0.0:18110"]
 
 ##
 # kaspa-wrpc-proxy image

@@ -38,6 +38,8 @@ ARG RUSTY_VERSION
 
 ENV REPO_URL="$REPO_URL" \
   RUSTY_VERSION="$RUSTY_VERSION" \
+  RUSTY_USER=kaspa \
+  RUSTY_HOME=/app/data \
   RUSTY_UID=50051 \
   PATH=/app:$PATH
 
@@ -45,18 +47,12 @@ RUN apk --no-cache add \
   libgcc \
   libstdc++ \
   bind-tools \
-  dumb-init \
+  su-exec \
   grep
 
-RUN mkdir -p /app/data/ && \
-  addgroup -S -g $RUSTY_UID rusty && \
-  adduser -h /app/data -S -D -g '' -G rusty -u $RUSTY_UID rusty
-
-USER rusty
-
-COPY ./entrypoint.sh /app/
-
-ENTRYPOINT ["dumb-init", "--"]
+RUN mkdir -p $RUSTY_HOME && \
+  addgroup -S -g $RUSTY_UID $RUSTY_USER && \
+  adduser -h $RUSTY_HOME -S -D -g '' -G $RUSTY_USER -u $RUSTY_UID $RUSTY_USER
 
 ##
 # kaspad image
@@ -66,6 +62,8 @@ FROM rusty AS kaspad
 
 EXPOSE 16111 16110 17110 18110
 VOLUME /app/data
+
+COPY ./entrypoint.sh /app/
 
 ENTRYPOINT ["entrypoint.sh"]
 
@@ -81,6 +79,8 @@ FROM rusty AS kaspa-wrpc-proxy
 
 COPY --from=builder /rusty-kaspa/target/release/kaspa-wrpc-proxy /app
 
+USER rusty
+
 CMD ["kaspa-wrpc-proxy", "--help"]
 
 ##
@@ -89,6 +89,8 @@ CMD ["kaspa-wrpc-proxy", "--help"]
 FROM rusty AS kaspa-wallet-cli-native
 
 COPY --from=builder /rusty-kaspa/target/release/kaspa-wallet-cli-native /app
+
+USER rusty
 
 CMD ["kaspa-wallet-cli-native", "--help"]
 
@@ -99,6 +101,8 @@ FROM rusty AS simpa
 
 COPY --from=builder /rusty-kaspa/target/release/simpa /app
 
+USER rusty
+
 CMD ["simpa", "--help"]
 
 ##
@@ -107,6 +111,8 @@ CMD ["simpa", "--help"]
 FROM rusty AS rothschild
 
 COPY --from=builder /rusty-kaspa/target/release/rothschild /app
+
+USER rusty
 
 CMD ["rothschild", "--help"]
 

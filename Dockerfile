@@ -79,7 +79,7 @@ FROM rusty AS kaspa-wrpc-proxy
 
 COPY --from=builder /rusty-kaspa/target/release/kaspa-wrpc-proxy /app
 
-USER rusty
+USER kaspa
 
 CMD ["kaspa-wrpc-proxy", "--help"]
 
@@ -90,7 +90,7 @@ FROM rusty AS kaspa-wallet-cli-native
 
 COPY --from=builder /rusty-kaspa/target/release/kaspa-wallet-cli-native /app
 
-USER rusty
+USER kaspa
 
 CMD ["kaspa-wallet-cli-native", "--help"]
 
@@ -101,7 +101,7 @@ FROM rusty AS simpa
 
 COPY --from=builder /rusty-kaspa/target/release/simpa /app
 
-USER rusty
+USER kaspa
 
 CMD ["simpa", "--help"]
 
@@ -112,7 +112,7 @@ FROM rusty AS rothschild
 
 COPY --from=builder /rusty-kaspa/target/release/rothschild /app
 
-USER rusty
+USER kaspa
 
 CMD ["rothschild", "--help"]
 

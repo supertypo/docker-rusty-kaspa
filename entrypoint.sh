@@ -23,5 +23,6 @@ fi
 
 echo "Setting owner on $RUSTY_HOME to $RUSTY_USER"
 chown $RUSTY_USER:$RUSTY_USER $RUSTY_HOME
-echo "Executing: $@ $externalIpArgs"
+echo "Executing: kaspad $@ $externalIpArgs"
 exec su-exec $RUSTY_USER kaspad "$@" $externalIpArgs
+

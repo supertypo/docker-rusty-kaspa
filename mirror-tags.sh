@@ -20,7 +20,7 @@ IGNORE_TAGS=(
 
 remote_tags=$(git ls-remote --tags $REMOTE_REPO | awk -F'/' '{print $3}')
 
-cd $LOCAL_REPO
+cd "$LOCAL_REPO"
 existing_tags=$(git tag -l)
 
 for tag in $remote_tags; do

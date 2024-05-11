@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if ! echo "$@" | grep -qE "\--externalip(=| )"; then
+if echo "$@" | grep -qE "^(/app/)?kaspad( |$)" && ! echo "$@" | grep -qE "\--externalip(=| )"; then
   listenPort=$(echo "$@" | grep -oP "\--listen(=| )\S+:\K\d+( |$)" | tail -1)
   if [ -n "$listenPort" ]; then
     listenPort=":$listenPort"
@@ -24,5 +24,5 @@ fi
 echo "Setting owner on $RUSTY_HOME to $RUSTY_USER"
 chown $RUSTY_USER:$RUSTY_USER $RUSTY_HOME
 echo "Executing: $@ $externalIpArgs"
-exec su-exec $RUSTY_USER kaspad "$@" $externalIpArgs
+exec su-exec $RUSTY_USER "$@" $externalIpArgs
 

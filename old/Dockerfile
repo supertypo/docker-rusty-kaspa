@@ -3,8 +3,8 @@
 ##
 FROM rust:1-alpine AS builder
 
-ARG GIT_REPO_URL
-ARG GIT_REF_NAME
+ARG REPO_DIR
+ARG ARTIFACTS
 
 RUN apk --no-cache add \
   musl-dev \
@@ -13,19 +13,20 @@ RUN apk --no-cache add \
   clang15-dev \
   linux-headers \
   wasm-pack \
-  openssl-dev \
-  git
+  openssl-dev
 
 RUN rustup component add rustfmt
 
-RUN git clone -b "$GIT_REF_NAME" "$GIT_REPO_URL" /rusty-kaspa
+COPY "$REPO_DIR" /rusty-kaspa
 
 WORKDIR /rusty-kaspa
 
 ENV RUSTFLAGS="-C target-feature=-crt-static" \
   CARGO_REGISTRIES_CRATES_IO_PROTOCOL="sparse"
 
-RUN cargo build --release
+RUN for artifact in $ARTIFACTS; do \
+  cargo build --release --bin $artifact; \
+done
 
 
 ##
@@ -71,7 +72,31 @@ ENTRYPOINT ["entrypoint.sh"]
 COPY --from=golang-kaspad /app/kaspactl /app
 COPY --from=builder /rusty-kaspa/target/release/kaspad /app
 
-CMD ["--yes", "--nologfiles", "--disable-upnp", "--utxoindex", "--rpclisten=0.0.0.0:16110", "--rpclisten-borsh=0.0.0.0:17110", "--rpclisten-json=0.0.0.0:18110"]
+CMD ["kaspad", "--yes", "--nologfiles", "--disable-upnp", "--utxoindex", "--rpclisten=0.0.0.0:16110", "--rpclisten-borsh=0.0.0.0:17110", "--rpclisten-json=0.0.0.0:18110"]
+
+
+##
+# kaspa-wrpc-proxy image
+##
+FROM rusty AS kaspa-wrpc-proxy
+
+COPY --from=builder /rusty-kaspa/target/release/kaspa-wrpc-proxy /app
+
+USER kaspa
+
+CMD ["kaspa-wrpc-proxy", "--help"]
+
+
+##
+# kaspa-wallet-cli-native image
+##
+FROM rusty AS kaspa-wallet-cli-native
+
+COPY --from=builder /rusty-kaspa/target/release/kaspa-wallet-cli-native /app
+
+USER kaspa
+
+CMD ["kaspa-wallet-cli-native", "--help"]
 
 
 ##
@@ -83,9 +108,7 @@ COPY --from=builder /rusty-kaspa/target/release/simpa /app
 
 USER kaspa
 
-ENTRYPOINT ["simpa"]
-
-CMD ["--help"]
+CMD ["simpa", "--help"]
 
 
 ##
@@ -97,6 +120,5 @@ COPY --from=builder /rusty-kaspa/target/release/rothschild /app
 
 USER kaspa
 
-ENTRYPOINT ["rothschild"]
+CMD ["rothschild", "--help"]
 
-CMD ["--help"]

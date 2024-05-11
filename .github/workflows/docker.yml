@@ -31,10 +31,10 @@ jobs:
           target: kaspad
           build-args: |
             GIT_REPO_URL=https://github.com/kaspanet/rusty-kaspa.git
-            GIT_REF_NAME=${GITHUB_REF_NAME}
+            GIT_REF_NAME=${{github.ref_name}}
           push: true
           tags: |
-            ${{ secrets.DOCKER_HUB_NAMESPACE }}/rusty-kaspad:${GITHUB_REF_NAME}
+            ${{ secrets.DOCKER_HUB_NAMESPACE }}/rusty-kaspad:${{github.ref_name}}
             ${{ secrets.DOCKER_HUB_NAMESPACE }}/rusty-kaspad:latest
           platforms: linux/amd64,linux/arm64
 
@@ -46,10 +46,10 @@ jobs:
           target: simpa
           build-args: |
             GIT_REPO_URL=https://github.com/kaspanet/rusty-kaspa.git
-            GIT_REF_NAME=${GITHUB_REF_NAME}
+            GIT_REF_NAME=${{github.ref_name}}
           push: true
           tags: |
-            ${{ secrets.DOCKER_HUB_NAMESPACE }}/rusty-simpa:${GITHUB_REF_NAME}
+            ${{ secrets.DOCKER_HUB_NAMESPACE }}/rusty-simpa:${{github.ref_name}}
             ${{ secrets.DOCKER_HUB_NAMESPACE }}/rusty-simpa:latest
           platforms: linux/amd64,linux/arm64
 
@@ -61,9 +61,9 @@ jobs:
           target: rothschild
           build-args: |
             GIT_REPO_URL=https://github.com/kaspanet/rusty-kaspa.git
-            GIT_REF_NAME=${GITHUB_REF_NAME}
+            GIT_REF_NAME=${{github.ref_name}}
           push: true
           tags: |
-            ${{ secrets.DOCKER_HUB_NAMESPACE }}/rusty-rothschild:${GITHUB_REF_NAME}
+            ${{ secrets.DOCKER_HUB_NAMESPACE }}/rusty-rothschild:${{github.ref_name}}
             ${{ secrets.DOCKER_HUB_NAMESPACE }}/rusty-rothschild:latest
           platforms: linux/amd64,linux/arm64

@@ -52,5 +52,5 @@ jobs:
               docker buildx imagetools create -t ${{ secrets.DOCKER_HUB_NAMESPACE }}/$component:latest \
                 ${{ secrets.DOCKER_HUB_NAMESPACE }}/$component:latest-amd64 \
                 ${{ secrets.DOCKER_HUB_NAMESPACE }}/$component:latest-arm64 \
-                --push
+              docker push ${{ secrets.DOCKER_HUB_NAMESPACE }}/$component:latest
           done

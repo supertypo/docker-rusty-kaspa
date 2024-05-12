@@ -25,7 +25,7 @@ WORKDIR /rusty-kaspa
 ENV RUSTFLAGS="-C target-feature=-crt-static" \
   CARGO_REGISTRIES_CRATES_IO_PROTOCOL="sparse"
 
-RUN nice -n 19 cargo build --release
+RUN nice -n 19 cargo build -j 4 --release
 
 
 ##

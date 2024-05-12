@@ -6,15 +6,17 @@ on:
       - '*'
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ${{ matrix.runs-on }}
     strategy:
       matrix:
         include:
           - platform: linux/amd64
+            variant: amd64
             runs-on: ubuntu-latest
           - platform: linux/arm64
-            runs-on: [self-hosted, ARM64]
+            variant: arm64
+            runs-on: self-hosted-ARM64
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v1
@@ -32,8 +34,23 @@ jobs:
           platforms: ${{ matrix.platform }}
           build-args: |
             GIT_REPO_URL=https://github.com/kaspanet/rusty-kaspa.git
-            GIT_REF_NAME=${{github.ref_name}}
+            GIT_REF_NAME=${{ github.ref_name }}
           push: true
           tags: |
-            ${{ secrets.DOCKER_HUB_NAMESPACE }}/rusty-kaspad:${{github.ref_name}}
-            ${{ secrets.DOCKER_HUB_NAMESPACE }}/rusty-kaspad:latest
+            ${{ secrets.DOCKER_HUB_NAMESPACE }}/rusty-kaspad:${{ github.ref_name }}-${{ matrix.variant }}
+            ${{ secrets.DOCKER_HUB_NAMESPACE }}/rusty-kaspad:latest-${{ matrix.variant }}
+
+  create-and-push-multiarch-manifests:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - run: |
+          for component in kaspad; do
+              docker buildx imagetools create -t ${{ secrets.DOCKER_HUB_NAMESPACE }}/$component:latest \
+                ${{ secrets.DOCKER_HUB_NAMESPACE }}/$component:latest-amd64 \
+                ${{ secrets.DOCKER_HUB_NAMESPACE }}/$component:latest-arm64 \
+                --push
+          done

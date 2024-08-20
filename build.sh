@@ -5,7 +5,8 @@
 REPO_URL_MAIN="https://github.com/kaspanet/rusty-kaspa"
 DOCKER_REPO_PREFIX="supertypo/rusty"
 #ARTIFACTS="kaspad kaspa-wrpc-proxy kaspa-wallet-cli-native simpa rothschild"
-ARTIFACTS="kaspad simpa rothschild"
+#ARTIFACTS="kaspad simpa rothschild"
+ARTIFACTS="kaspad"
 ARCHES="linux/amd64 linux/arm64"
 
 BUILD_DIR="$(dirname $0)"

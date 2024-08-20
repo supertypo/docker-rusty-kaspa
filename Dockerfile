@@ -1,7 +1,7 @@
 ##
 # builder image
 ##
-FROM rust:1-alpine AS builder
+FROM rust:1.78-alpine AS builder
 
 ARG REPO_DIR
 ARG ARTIFACTS

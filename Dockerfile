@@ -1,7 +1,7 @@
 ##
 # builder image
 ##
-FROM rust:1.78-alpine AS builder
+FROM rust:1.80-alpine AS builder
 
 ARG REPO_DIR
 ARG ARTIFACTS
@@ -24,9 +24,15 @@ WORKDIR /rusty-kaspa
 ENV RUSTFLAGS="-C target-feature=-crt-static" \
   CARGO_REGISTRIES_CRATES_IO_PROTOCOL="sparse"
 
-RUN for artifact in $ARTIFACTS; do \
-  cargo build --release --bin $artifact; \
-done
+RUN cargo fetch
+
+# Patch missing include in librocksdb-sys-0.16.0+8.10.0
+RUN sed -i '1i #include <cstdint>' $(find /usr/local/cargo/registry/src/ -path "*/librocksdb-sys-0.16.0+8.10.0/*/offpeak_time_info.h")
+
+RUN \
+  for artifact in $ARTIFACTS; do \
+    cargo build --release --bin $artifact; \
+  done
 
 ##
 # base runtime image

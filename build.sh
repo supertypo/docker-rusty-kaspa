@@ -11,10 +11,15 @@ ARCHES="linux/amd64 linux/arm64"
 
 BUILD_DIR="$(dirname $0)"
 PUSH=$1
-VERSION=$2
+VERSIONS=$2
 TAG=${3:-master}
 REPO_URL=${4:-$REPO_URL_MAIN}
 REPO_DIR="$BUILD_DIR/work/$(echo $REPO_URL | sed -E 's/[^a-zA-Z0-9]+/_/g')"
+
+if [ -z $PUSH ] || [ -z $VERSIONS ]; then
+  echo "Usage: $0 push|nopush \"versions\" [tag] [git-repo]"
+  exit 1
+fi
 
 set -e
 
@@ -48,28 +53,16 @@ plain_build() {
     --target $1 \
     --tag $dockerRepo:$tag "$BUILD_DIR"
 
-  if [ -n "$VERSION" ]; then
-     $docker tag $dockerRepo:$tag $dockerRepo:$VERSION
-     echo Tagged $dockerRepo:$VERSION
-     if [ "$REPO_URL" = "$REPO_URL_MAIN" ]; then
-       $docker tag $dockerRepo:$tag $dockerRepo:latest
-       echo Tagged $dockerRepo:latest
-     fi
-   else
-     $docker tag $dockerRepo:$tag $dockerRepo:nightly
-     echo Tagged $dockerRepo:nightly
-  fi
+  for version in $VERSIONS; do
+    $docker tag $dockerRepo:$tag $dockerRepo:$version
+    echo Tagged $dockerRepo:$version
+  done
 
   if [ "$PUSH" = "push" ]; then
     $docker push $dockerRepo:$tag
-    if [ -n "$VERSION" ]; then
-       $docker push $dockerRepo:$VERSION
-       if [ "$REPO_URL" = "$REPO_URL_MAIN" ]; then
-         $docker push $dockerRepo:latest
-       fi
-     else
-       $docker push $dockerRepo:nightly
-    fi
+    for version in $VERSIONS; do
+      $docker push $dockerRepo:$version
+    done
   fi
   echo "===================================================="
   echo " Completed current arch build for $1"
@@ -83,17 +76,15 @@ multi_arch_build() {
   echo "===================================================="
   dockerRepo="${DOCKER_REPO_PREFIX}-$1"
   dockerRepoArgs=
+
   if [ "$PUSH" = "push" ]; then
     dockerRepoArgs="$dockerRepoArgs --push"
   fi
-  if [ -n "$VERSION" ]; then
-    dockerRepoArgs="$dockerRepoArgs --tag $dockerRepo:$VERSION"
-    if [ "$REPO_URL" = "$REPO_URL_MAIN" ]; then
-      dockerRepoArgs="$dockerRepoArgs --tag $dockerRepo:latest"
-    fi
-  else
-    dockerRepoArgs="$dockerRepoArgs --tag $dockerRepo:nightly"
-  fi
+
+  for version in $VERSIONS; do
+    dockerRepoArgs="$dockerRepoArgs --tag $dockerRepo:$version"
+  done
+
   $docker buildx build --pull --platform=$(echo $ARCHES | sed 's/ /,/g') $dockerRepoArgs \
     --build-arg REPO_DIR="$REPO_DIR" \
     --build-arg ARTIFACTS="$ARTIFACTS" \
@@ -127,4 +118,3 @@ else
     plain_build $artifact
   done
 fi
-

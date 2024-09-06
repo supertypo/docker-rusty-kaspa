@@ -29,6 +29,9 @@ RUN cargo fetch
 # Patch missing include in librocksdb-sys-0.16.0+8.10.0
 RUN sed -i '1i #include <cstdint>' $(find /usr/local/cargo/registry/src/ -path "*/librocksdb-sys-0.16.0+8.10.0/*/offpeak_time_info.h")
 
+# Remove vendored openssl (for now)
+RUN sed -i 's/openssl .*\["vendored"\] }//' $(find . -name Cargo.toml)
+
 RUN \
   for artifact in $ARTIFACTS; do \
     cargo build --release --bin $artifact; \

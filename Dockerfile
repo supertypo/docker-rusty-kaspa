@@ -1,10 +1,7 @@
 ##
 # builder image
 ##
-FROM rust:1.80-alpine AS builder
-
-ARG REPO_DIR
-ARG ARTIFACTS
+FROM rust:1.81-alpine AS builder
 
 RUN apk --no-cache add \
   musl-dev \
@@ -17,6 +14,7 @@ RUN apk --no-cache add \
 
 RUN rustup component add rustfmt
 
+ARG REPO_DIR
 COPY "$REPO_DIR" /rusty-kaspa
 
 WORKDIR /rusty-kaspa
@@ -32,6 +30,7 @@ RUN sed -i '1i #include <cstdint>' $(find /usr/local/cargo/registry/src/ -path "
 # Remove vendored openssl (for now)
 RUN sed -i 's/openssl .*\["vendored"\] }//' $(find . -name Cargo.toml)
 
+ARG ARTIFACTS
 RUN \
   for artifact in $ARTIFACTS; do \
     cargo build --release --bin $artifact; \

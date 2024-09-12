@@ -1,12 +1,10 @@
 #!/bin/sh
 
-# Arguments: [push|nopush] [version] [git-repo]
-
 REPO_URL_MAIN="https://github.com/kaspanet/rusty-kaspa"
 DOCKER_REPO_PREFIX="supertypo/rusty"
 #ARTIFACTS="kaspad kaspa-wrpc-proxy kaspa-wallet-cli-native simpa rothschild"
-#ARTIFACTS="kaspad simpa rothschild"
-ARTIFACTS="kaspad"
+ARTIFACTS="kaspad simpa rothschild"
+#ARTIFACTS="kaspad"
 ARCHES="linux/amd64 linux/arm64"
 
 BUILD_DIR="$(dirname $0)"
@@ -16,8 +14,8 @@ TAG=${3:-master}
 REPO_URL=${4:-$REPO_URL_MAIN}
 REPO_DIR="$BUILD_DIR/work/$(echo $REPO_URL | sed -E 's/[^a-zA-Z0-9]+/_/g')"
 
-if [ -z $PUSH ] || [ -z $VERSIONS ]; then
-  echo "Usage: $0 push|nopush \"versions\" [tag] [git-repo]"
+if [ -z "$PUSH" ] || [ -z "$VERSIONS" ]; then
+  echo "Usage: $0 push|nopush \"multiple versions\" [tag] [git-repo]"
   exit 1
 fi
 

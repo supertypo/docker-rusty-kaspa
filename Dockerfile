@@ -1,7 +1,7 @@
 ##
 # builder image
 ##
-FROM rust:1.81-alpine AS builder
+FROM rust:1.82-alpine AS builder
 
 RUN apk --no-cache add \
   musl-dev \
@@ -81,28 +81,6 @@ COPY --from=builder /rusty-kaspa/target/release/kaspad /app
 CMD ["kaspad", "--yes", "--nologfiles", "--disable-upnp", "--utxoindex", "--rpclisten=0.0.0.0:16110", "--rpclisten-borsh=0.0.0.0:17110", "--rpclisten-json=0.0.0.0:18110"]
 
 ##
-# kaspa-wrpc-proxy image
-##
-FROM rusty AS kaspa-wrpc-proxy
-
-COPY --from=builder /rusty-kaspa/target/release/kaspa-wrpc-proxy /app
-
-USER kaspa
-
-CMD ["kaspa-wrpc-proxy", "--help"]
-
-##
-# kaspa-wallet-cli-native image
-##
-FROM rusty AS kaspa-wallet-cli-native
-
-COPY --from=builder /rusty-kaspa/target/release/kaspa-wallet-cli-native /app
-
-USER kaspa
-
-CMD ["kaspa-wallet-cli-native", "--help"]
-
-##
 # simpa image
 ##
 FROM rusty AS simpa
@@ -111,7 +89,8 @@ COPY --from=builder /rusty-kaspa/target/release/simpa /app
 
 USER kaspa
 
-CMD ["simpa", "--help"]
+ENTRYPOINT ["simpa"]
+CMD ["--help"]
 
 ##
 # rothschild image
@@ -122,5 +101,17 @@ COPY --from=builder /rusty-kaspa/target/release/rothschild /app
 
 USER kaspa
 
-CMD ["rothschild", "--help"]
+ENTRYPOINT ["rothschild"]
+CMD ["--help"]
+
+##
+# kaspa-wallet image
+##
+FROM rusty AS kaspa-wallet
+
+COPY --from=builder /rusty-kaspa/target/release/kaspa-wallet /app
+
+USER kaspa
+
+ENTRYPOINT ["kaspa-wallet"]
 

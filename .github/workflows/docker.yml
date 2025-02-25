@@ -59,7 +59,9 @@ jobs:
           path: rusty-kaspa
 
       - name: Copy Dockerfile
-        run: cp docker/Dockerfile ./Dockerfile
+        run: |
+          cp docker/Dockerfile ./Dockerfile
+          cp docker/entrypoint.sh ./entrypoint.sh
 
       - name: Build and push by digest
         id: build

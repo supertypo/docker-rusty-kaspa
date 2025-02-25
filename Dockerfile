@@ -14,7 +14,7 @@ RUN apk --no-cache add \
 
 RUN rustup component add rustfmt
 
-ARG REPO_DIR
+ARG REPO_DIR=.
 COPY "$REPO_DIR" /rusty-kaspa
 
 WORKDIR /rusty-kaspa

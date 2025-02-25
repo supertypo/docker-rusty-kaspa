@@ -74,6 +74,7 @@ jobs:
             REPO_URL=${{ env.GIT_REPO }}
             RUSTY_VERSION=${{ github.ref_name }}
             ARTIFACTS=${{ env.ARTIFACTS }}
+          target: kaspad
           outputs: type=image,"name=${{ vars.DOCKER_REPO }}",push-by-digest=true,name-canonical=true,push=true
 
       - name: Export digest

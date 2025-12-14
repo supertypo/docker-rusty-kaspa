@@ -24,9 +24,6 @@ ENV RUSTFLAGS="-C target-feature=-crt-static" \
 
 RUN cargo fetch
 
-# Patch missing include in librocksdb-sys-0.17.3+10.4.2
-RUN sed -i '1i #include <cstdint>' $(find /usr/local/cargo/registry/src/ -path "*/librocksdb-sys-0.17.3+10.4.2/*/offpeak_time_info.h")
-
 # Remove vendored openssl (for now)
 RUN sed -i 's/openssl .*\["vendored"\] }//' $(find . -name Cargo.toml)
 

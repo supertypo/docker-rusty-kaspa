@@ -1,7 +1,7 @@
 ##
 # builder image
 ##
-FROM rust:1.82-alpine AS builder
+FROM rust:1.89-alpine AS builder
 
 RUN apk --no-cache add \
   musl-dev \

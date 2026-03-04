@@ -30,6 +30,7 @@ echo "===================================================="
 (cd "$REPO_DIR" && git fetch && git checkout $TAG && (git pull 2>/dev/null | true))
 
 tag=$(cd "$REPO_DIR" && git log -n1 --format="%cs.%h")
+RUST_VERSION=$(grep '^rust-version' "$REPO_DIR/Cargo.toml" | sed 's/.*"\(.*\)".*/\1/')
 
 docker=docker
 id -nG $USER | grep -qw docker || docker="sudo $docker"
@@ -46,6 +47,7 @@ plain_build() {
     --build-arg ARTIFACTS="$ARTIFACTS" \
     --build-arg REPO_URL=$REPO_URL \
     --build-arg RUSTY_VERSION="$tag" \
+    --build-arg RUST_VERSION="$RUST_VERSION" \
     --target $1 \
     --tag $dockerRepo:$tag "$BUILD_DIR"
 
@@ -86,6 +88,7 @@ multi_arch_build() {
     --build-arg ARTIFACTS="$ARTIFACTS" \
     --build-arg REPO_URL=$REPO_URL \
     --build-arg RUSTY_VERSION="$tag" \
+    --build-arg RUST_VERSION="$RUST_VERSION" \
     --target $1 \
     --tag $dockerRepo:$tag "$BUILD_DIR"
   echo "===================================================="

@@ -73,6 +73,11 @@ jobs:
           cp docker/Dockerfile ./Dockerfile
           cp docker/entrypoint.sh ./entrypoint.sh
 
+      - name: Extract Rust version
+        run: |
+          RUST_VERSION=$(grep '^rust-version' rusty-kaspa/Cargo.toml | sed 's/.*"\(.*\)".*/\1/')
+          echo "RUST_VERSION=$RUST_VERSION" >> $GITHUB_ENV
+
       - name: Build and push by digest
         id: build
         uses: docker/build-push-action@v6
@@ -86,6 +91,7 @@ jobs:
             REPO_URL=${{ env.GIT_REPO }}
             RUSTY_VERSION=${{ env.GIT_VERSION }}
             ARTIFACTS=${{ env.ARTIFACTS }}
+            RUST_VERSION=${{ env.RUST_VERSION }}
           target: kaspad
           outputs: type=image,"name=${{ vars.DOCKER_REPO }},${{ vars.DOCKER_LEGACY_REPO }}",push-by-digest=true,name-canonical=true,push=true
 

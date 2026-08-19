@@ -176,7 +176,8 @@ jobs:
     needs:
       - scan
       - build
-    if: ${{ needs.scan.outputs.any == 'true' }}
+    # always(): one failed branch must not prevent tagging the branches that built fine
+    if: ${{ always() && needs.scan.outputs.any == 'true' && needs.build.result != 'cancelled' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -202,6 +203,11 @@ jobs:
       - name: Create manifest list and push
         working-directory: ${{ runner.temp }}/digests
         run: |
+          # Both platform digests must be present; a partial build must not be tagged
+          if [ "$(ls -1 | wc -l)" -ne 2 ]; then
+            echo "Expected 2 digests for ${{ matrix.branch.name }}, found $(ls -1 | wc -l) - build incomplete"
+            exit 1
+          fi
           docker buildx imagetools create \
             -t ${{ vars.DOCKER_LEGACY_REPO }}:${{ matrix.branch.sanitized }} \
             -t ${{ vars.DOCKER_LEGACY_REPO }}:${{ matrix.branch.sanitized }}-${{ matrix.branch.short }} \
